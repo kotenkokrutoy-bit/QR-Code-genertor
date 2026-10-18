@@ -1,0 +1,53 @@
+from tkinter import filedialog, messagebox
+import customtkinter as ctk
+import qrcode
+
+ctk.set_appearance_mode("dark")
+
+
+class App(ctk.CTk):
+
+    def __init__(self):
+        super().__init__()
+        self.title("QR Генератор")
+        self.geometry("400x500")
+        self.attributes("-alpha", 0.90)
+        self.img = None
+
+        b1 = ctk.CTkButton(self, text="?", width=32, command=self.info)
+        b1.place(x=355, y=15)
+
+        t = ctk.CTkLabel(self, text="QR Generator", font=("Arial", 22))
+        t.pack(pady=(25, 15))
+
+        self.ent = ctk.CTkEntry(self, width=280, height=38)
+        self.ent.pack(pady=10)
+
+        b2 = ctk.CTkButton(self, text="Create QR", command=self.gen)
+        b2.pack(pady=10)
+
+        self.box = ctk.CTkLabel(self, text="", width=220, height=220)
+        self.box.pack(pady=15)
+
+        b3 = ctk.CTkButton(self, text="Download QR", command=self.save)
+        b3.pack(pady=10)
+
+    def gen(self):
+        d = self.ent.get().strip()
+        if not d:
+            return
+        if "." in d and " " not in d and not d.startswith("http"):
+            d = "https://" + d
+        self.img = qrcode.make(d).convert("RGB")
+        pic = ctk.CTkImage(self.img, self.img, size=(200, 200))
+        self.box.configure(image=pic)
+
+    def save(self):
+        if self.img:
+            p = filedialog.asksaveasfilename(defaultextension=".png")
+            if p:
+                self.img.save(p)
+
+
+if __name__ == "__main__":
+    App().mainloop()
